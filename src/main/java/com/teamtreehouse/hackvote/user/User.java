@@ -1,20 +1,25 @@
 package com.teamtreehouse.hackvote.user;
 
 import com.teamtreehouse.hackvote.core.AbstractEntity;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 
 @Entity
-@Getter
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class User extends AbstractEntity {
-    private final String username;
+    private String username;
+    private String password;
 
-    public User() {
-        this(null);
+    protected User() {
+        super();
     }
 
-    public User(String username) {
+    public User(String username, String password) {
+        this();
         this.username = username;
+        this.password = password;
     }
 }

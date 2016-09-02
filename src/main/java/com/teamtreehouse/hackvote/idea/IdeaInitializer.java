@@ -22,7 +22,7 @@ public class IdeaInitializer {
             return;
         }
 
-        User user = new User("sample");
+        User user = new User("user","password");
         users.save(user);
 
         Idea vr = new Idea(user,"VR game for learning Java","Creating a VR game for learning to code would give students a truly immersive experience into the syntax of a programming language.");
