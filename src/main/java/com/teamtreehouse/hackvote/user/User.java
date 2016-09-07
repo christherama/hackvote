@@ -1,14 +1,10 @@
 package com.teamtreehouse.hackvote.user;
 
 import com.teamtreehouse.hackvote.core.AbstractEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class User extends AbstractEntity {
     private String username;
     private String password;
@@ -21,5 +17,27 @@ public class User extends AbstractEntity {
         this();
         this.username = username;
         this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        User u = (User)o;
+        return getId().equals(u.getId());
     }
 }

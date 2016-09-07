@@ -4,8 +4,6 @@ import com.teamtreehouse.hackvote.comment.Comment;
 import com.teamtreehouse.hackvote.core.AbstractEntity;
 import com.teamtreehouse.hackvote.user.User;
 import com.teamtreehouse.hackvote.vote.Vote;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -20,8 +18,6 @@ import java.util.Set;
 import static com.teamtreehouse.hackvote.vote.Vote.Status;
 
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class Idea extends AbstractEntity {
 
     @ManyToOne
@@ -48,6 +44,46 @@ public class Idea extends AbstractEntity {
         this.user = user;
         this.title = title;
         this.description = description;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public LocalDateTime getPostedDate() {
+        return postedDate;
+    }
+
+    public void setPostedDate(LocalDateTime postedDate) {
+        this.postedDate = postedDate;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Set<Vote> getVotes() {
+        return votes;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
     }
 
     public int getNumComments() {
