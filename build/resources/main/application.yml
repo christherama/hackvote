@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+  data:
+    rest:
+      basePath: /api/v1
+      enable-enum-translation: true
+  jackson:
+    mapper:
+      infer-property-mutators: false
