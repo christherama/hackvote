@@ -10,3 +10,8 @@ spring:
   jackson:
     mapper:
       infer-property-mutators: false
+
+jwt:
+  header: Authorization
+  secret: k@47jdkoKfdI$#(LLdk
+  expiration: 604800

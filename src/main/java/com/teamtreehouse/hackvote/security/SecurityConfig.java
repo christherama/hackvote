@@ -1,7 +1,5 @@
-package com.teamtreehouse.hackvote.config;
+package com.teamtreehouse.hackvote.security;
 
-import com.teamtreehouse.hackvote.security.JwtAuthenticationFilter;
-import com.teamtreehouse.hackvote.security.RestAuthenticationEntryPoint;
 import com.teamtreehouse.hackvote.user.User;
 import com.teamtreehouse.hackvote.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +19,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private String basePath;
+
     private RestAuthenticationEntryPoint authEntryPoint;
     private JwtAuthenticationFilter jwtAuthFilter;
     private UserService userService;
 
     @Autowired
     public SecurityConfig(
-            @Value("${spring.data.rest.basePath}") String basePath,
             RestAuthenticationEntryPoint authEntryPoint,
-            JwtAuthenticationFilter jwtAuthFilter) {
-        this.basePath = basePath;
+            JwtAuthenticationFilter jwtAuthFilter,
+            UserService userService,
+            @Value("${spring.data.rest.basePath}") String basePath) {
         this.authEntryPoint = authEntryPoint;
         this.jwtAuthFilter = jwtAuthFilter;
+        this.userService = userService;
+        this.basePath = basePath;
     }
 
     @Override

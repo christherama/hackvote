@@ -5,6 +5,9 @@ import com.teamtreehouse.hackvote.user.User;
 import com.teamtreehouse.hackvote.user.UserRepository;
 import com.teamtreehouse.hackvote.vote.Vote;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -14,16 +17,26 @@ import static com.teamtreehouse.hackvote.vote.Vote.Status;
 
 @Service
 public class IdeaInitializer {
+    private IdeaRepository ideas;
+    private UserRepository users;
 
     @Autowired
     public IdeaInitializer(IdeaRepository ideas, UserRepository users) {
         Assert.notNull(ideas, "IdeaRepository must not be null.");
         Assert.notNull(users, "IdeaRepository must not be null.");
 
+        this.ideas = ideas;
+        this.users = users;
+
         if(ideas.count() > 0 || users.count() > 0) {
             return;
         }
 
+        User admin = new User("admin","password");
+        runAsUser(admin,this::addIdeas);
+    }
+
+    private void addIdeas() {
         User user1 = new User("user1","password");
         User user2 = new User("user2","password");
         User user3 = new User("user3","password");
@@ -51,5 +64,16 @@ public class IdeaInitializer {
         vr.vote(new Vote(vr,user2,Status.UP));
         vr.vote(new Vote(vr,user3,Status.DOWN));
         ideas.save(vr);
+    }
+
+    private void runAsUser(User user, Runnable runnable) {
+        SecurityContextHolder.clearContext();
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+                user.getUsername(),
+                user.getPassword(),
+                AuthorityUtils.createAuthorityList(user.getRole())
+        ));
+        runnable.run();
+        SecurityContextHolder.clearContext();
     }
 }

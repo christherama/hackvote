@@ -7,7 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -15,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 public class Jwt {
     private static final String CLAIM_KEY_USERNAME = "subject";
     private static final String CLAIM_KEY_DATE_CREATED = "created";
