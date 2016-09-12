@@ -5,9 +5,12 @@ import com.teamtreehouse.hackvote.user.User;
 import com.teamtreehouse.hackvote.user.UserRepository;
 import com.teamtreehouse.hackvote.vote.Vote;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -15,8 +18,8 @@ import java.util.Arrays;
 
 import static com.teamtreehouse.hackvote.vote.Vote.Status;
 
-@Service
-public class IdeaInitializer {
+@Component
+public class IdeaInitializer implements ApplicationRunner {
     private IdeaRepository ideas;
     private UserRepository users;
 
@@ -27,16 +30,18 @@ public class IdeaInitializer {
 
         this.ideas = ideas;
         this.users = users;
+    }
 
-        if(ideas.count() > 0 || users.count() > 0) {
-            return;
-        }
-
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
         User admin = new User("admin","password");
         runAsUser(admin,this::addIdeas);
     }
 
     private void addIdeas() {
+        if(ideas.count() > 0 || users.count() > 0) {
+            return;
+        }
         User user1 = new User("user1","password");
         User user2 = new User("user2","password");
         User user3 = new User("user3","password");
