@@ -13,6 +13,7 @@ public class RestConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
+        config.addAllowedMethod("*");
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         source.registerCorsConfiguration("/api/**", config);

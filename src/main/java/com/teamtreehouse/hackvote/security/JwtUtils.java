@@ -96,7 +96,7 @@ public class JwtUtils {
     }
 
     public boolean isValid(String token) {
-        return token != null && !isTokenExpired(token);
+        return token != null && getUsername(token) != null && !isTokenExpired(token);
     }
 
     private static class TokenBuilder {

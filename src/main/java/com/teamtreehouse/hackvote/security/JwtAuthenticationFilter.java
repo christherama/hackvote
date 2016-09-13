@@ -20,15 +20,12 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends GenericFilterBean {
     private final String authHeader;
-    private final UserRepository users;
     private final JwtUtils jwtUtils;
 
     @Autowired
     public JwtAuthenticationFilter(
-            UserRepository users,
             JwtUtils jwtUtils,
             @Value("${jwt.header}") String authHeader) {
-        this.users = users;
         this.authHeader = authHeader;
         this.jwtUtils = jwtUtils;
     }
