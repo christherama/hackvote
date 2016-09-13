@@ -34,9 +34,6 @@ public class AuthenticationController {
 
     @RequestMapping(value = "${jwt.route.auth}", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestParam String username, @RequestParam String password) throws AuthenticationException {
-        System.out.printf("%nEntered controller method...%n");
-
-
         // Perform the security
         final Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username,password)

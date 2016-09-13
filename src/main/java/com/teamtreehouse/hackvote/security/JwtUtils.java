@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Component
 public class JwtUtils {
-    private static final String CLAIM_KEY_USERNAME = "subject";
+    private static final String CLAIM_KEY_USERNAME = "sub";
     private static final String CLAIM_KEY_DATE_CREATED = "created";
 
     @Value("${jwt.secret}")
@@ -27,10 +27,7 @@ public class JwtUtils {
     private Long expiration;
 
     public String generateFromUserDetails(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-        claims.put(CLAIM_KEY_DATE_CREATED, new Date());
-        return new TokenBuilder(secret,expiration).withClaims(claims).build();
+        return new TokenBuilder(secret,expiration).withUser(userDetails).build();
     }
 
     public String getUsername(String token) {
@@ -99,7 +96,7 @@ public class JwtUtils {
         return
                 getUsername(token).equals(user.getUsername())
                         && !isTokenExpired(token)
-                        && !isCreatedBeforeLastPasswordReset(token, user);
+                        /*&& !isCreatedBeforeLastPasswordReset(token, user)*/;
     }
 
     // Temporary until Jwts updates to java.time API
@@ -118,6 +115,13 @@ public class JwtUtils {
         private TokenBuilder(String secret, Long expiration) {
             this.secret = secret;
             this.expiration = expiration;
+        }
+
+        private TokenBuilder withUser(UserDetails userDetails) {
+            claims = new HashMap<>();
+            claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
+            claims.put(CLAIM_KEY_DATE_CREATED, new Date());
+            return this;
         }
 
         private TokenBuilder withClaims(Map<String,Object> claims) {

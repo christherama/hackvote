@@ -42,19 +42,20 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         // Get username from token
         String username = jwtUtils.getUsername(token);
 
+        System.out.printf("%n%nTOKEN: %s%nCURRENT USER: %s%n%n",token,username);
+
         // Authenticate if token is valid
         // If token isn't valid, username will be null and won't be authenticated
         // => Resources will be secured in such a way that will prevent operations
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = users.findByUsername(username);
             if(jwtUtils.isValid(token,user)) {
+                System.out.printf("%n%nAUTHENTICATED!%n%n");
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
-
-        System.out.printf("%nContinuing filter...%n");
 
         chain.doFilter(request,response);
     }
