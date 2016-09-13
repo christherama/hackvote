@@ -1,5 +1,6 @@
 package com.teamtreehouse.hackvote.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.teamtreehouse.hackvote.core.AbstractEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -16,7 +17,11 @@ public class User extends AbstractEntity implements UserDetails {
     public static PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     private String username;
+
+    @JsonIgnore
     private String password;
+
+    @JsonIgnore
     private LocalDateTime lastPasswordChange;
 
     protected User() {
@@ -34,25 +39,30 @@ public class User extends AbstractEntity implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true;
     }
 
+    @JsonIgnore
     public String getRole() {
         return "ROLE_USER";
     }
@@ -62,6 +72,7 @@ public class User extends AbstractEntity implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.createAuthorityList(getRole());
     }
