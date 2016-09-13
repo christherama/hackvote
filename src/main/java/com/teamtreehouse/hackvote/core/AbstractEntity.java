@@ -1,10 +1,10 @@
 package com.teamtreehouse.hackvote.core;
 
-import org.springframework.hateoas.Identifiable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.*;
 

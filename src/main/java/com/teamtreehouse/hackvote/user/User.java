@@ -8,7 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.Entity;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
