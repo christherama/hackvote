@@ -1,6 +1,7 @@
 package com.teamtreehouse.hackvote.comment;
 
 import com.teamtreehouse.hackvote.core.AbstractEntity;
+import com.teamtreehouse.hackvote.core.UserData;
 import com.teamtreehouse.hackvote.user.User;
 
 import javax.persistence.Entity;
@@ -8,7 +9,7 @@ import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
 @Entity
-public class Comment extends AbstractEntity {
+public class Comment extends AbstractEntity implements UserData {
     @ManyToOne
     private User user;
     private LocalDateTime postedDate;
@@ -28,6 +29,7 @@ public class Comment extends AbstractEntity {
         return user;
     }
 
+    @Override
     public void setUser(User user) {
         this.user = user;
     }

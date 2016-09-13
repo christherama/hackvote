@@ -2,6 +2,7 @@ package com.teamtreehouse.hackvote.idea;
 
 import com.teamtreehouse.hackvote.comment.Comment;
 import com.teamtreehouse.hackvote.core.AbstractEntity;
+import com.teamtreehouse.hackvote.core.UserData;
 import com.teamtreehouse.hackvote.user.User;
 import com.teamtreehouse.hackvote.vote.Vote;
 
@@ -18,7 +19,7 @@ import java.util.Set;
 import static com.teamtreehouse.hackvote.vote.Vote.Status;
 
 @Entity
-public class Idea extends AbstractEntity {
+public class Idea extends AbstractEntity implements UserData {
 
     @ManyToOne
     private User user;
@@ -50,6 +51,7 @@ public class Idea extends AbstractEntity {
         return user;
     }
 
+    @Override
     public void setUser(User user) {
         this.user = user;
     }
