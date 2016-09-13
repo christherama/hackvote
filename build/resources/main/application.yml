@@ -12,6 +12,9 @@ spring:
       infer-property-mutators: false
 
 jwt:
+  route:
+    auth: /auth
+    refresh: /refresh
   header: Authorization
   secret: k@47jdkoKfdI$#(LLdk
   expiration: 604800

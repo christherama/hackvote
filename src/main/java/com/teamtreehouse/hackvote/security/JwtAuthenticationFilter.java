@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -18,36 +19,42 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends GenericFilterBean {
-    private String authHeader;
-    private UserRepository users;
+    private final String authHeader;
+    private final UserRepository users;
+    private final JwtUtils jwtUtils;
 
     @Autowired
     public JwtAuthenticationFilter(
             UserRepository users,
+            JwtUtils jwtUtils,
             @Value("${jwt.header}") String authHeader) {
         this.users = users;
         this.authHeader = authHeader;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         // Get auth token
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        Jwt token = new Jwt(httpRequest.getHeader(authHeader));
+        String token = httpRequest.getHeader(authHeader);
 
         // Get username from token
-        String username = token.getUsername();
+        String username = jwtUtils.getUsername(token);
 
         // Authenticate if token is valid
         // If token isn't valid, username will be null and won't be authenticated
         // => Resources will be secured in such a way that will prevent operations
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = users.findByUsername(username);
-            if(token.isValid(user)) {
+            if(jwtUtils.isValid(token,user)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+
+        System.out.printf("%nContinuing filter...%n");
 
         chain.doFilter(request,response);
     }

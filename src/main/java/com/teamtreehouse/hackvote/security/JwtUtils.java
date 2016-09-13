@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,7 +15,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Jwt {
+@Component
+public class JwtUtils {
     private static final String CLAIM_KEY_USERNAME = "subject";
     private static final String CLAIM_KEY_DATE_CREATED = "created";
 
@@ -24,23 +26,17 @@ public class Jwt {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    private String token;
-
-    public Jwt(String token) {
-        this.token = token;
-    }
-
-    public Jwt fromUserDetails(UserDetails userDetails) {
+    public String generateFromUserDetails(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
         claims.put(CLAIM_KEY_DATE_CREATED, new Date());
-        return new JwtBuilder(secret,expiration).withClaims(claims).build();
+        return new TokenBuilder(secret,expiration).withClaims(claims).build();
     }
 
-    public String getUsername() {
+    public String getUsername(String token) {
         String username;
         try {
-            final Claims claims = getClaims();
+            final Claims claims = getClaims(token);
             username = claims.getSubject();
         } catch (Exception e) {
             username = null;
@@ -48,23 +44,23 @@ public class Jwt {
         return username;
     }
 
-    public LocalDateTime getTimeCreated() {
+    public LocalDateTime getTimeCreated(String token) {
         try {
-            return LocalDateTime.parse(getClaims().get(CLAIM_KEY_DATE_CREATED).toString());
+            return LocalDateTime.parse(getClaims(token).get(CLAIM_KEY_DATE_CREATED).toString());
         } catch (Exception e) {
             return null;
         }
     }
 
-    public LocalDateTime getExpirationTime() {
+    public LocalDateTime getExpirationTime(String token) {
         try {
-            return localDateTimeFromDate(getClaims().getExpiration());
+            return localDateTimeFromDate(getClaims(token).getExpiration());
         } catch (Exception e) {
             return null;
         }
     }
 
-    private Claims getClaims() {
+    private Claims getClaims(String token) {
         try {
             return Jwts.parser()
                     .setSigningKey(secret)
@@ -75,39 +71,35 @@ public class Jwt {
         }
     }
 
-    private boolean isTokenExpired() {
-        return getExpirationTime().isBefore(LocalDateTime.now());
+    private boolean isTokenExpired(String token) {
+        return getExpirationTime(token).isBefore(LocalDateTime.now());
     }
 
-    private boolean isCreatedBeforeLastPasswordReset(User user) {
+    private boolean isCreatedBeforeLastPasswordReset(String token, User user) {
         LocalDateTime lastPwChange = user.getLastPasswordChange();
-        return lastPwChange != null && getTimeCreated().isBefore(lastPwChange);
+        return lastPwChange != null && getTimeCreated(token).isBefore(lastPwChange);
     }
 
-    public boolean canTokenBeRefreshed(User user) {
-        return !isCreatedBeforeLastPasswordReset(user)
-                && (!isTokenExpired());
+    public boolean canTokenBeRefreshed(String token, User user) {
+        return !isCreatedBeforeLastPasswordReset(token, user)
+                && (!isTokenExpired(token));
     }
 
-    public void refresh() {
+    public String refresh(String token) {
         try {
-            final Claims claims = getClaims();
+            final Claims claims = getClaims(token);
             claims.put(CLAIM_KEY_DATE_CREATED, LocalDateTime.now());
-            this.token = new JwtBuilder(secret,expiration).withClaims(claims).build().getToken();
+            return new TokenBuilder(secret,expiration).withClaims(claims).build();
         } catch (Exception e) {
-            this.token = null;
+            return null;
         }
     }
 
-    public boolean isValid(User user) {
+    public boolean isValid(String token, User user) {
         return
-                getUsername().equals(user.getUsername())
-                        && !isTokenExpired()
-                        && !isCreatedBeforeLastPasswordReset(user);
-    }
-
-    public String getToken() {
-        return token;
+                getUsername(token).equals(user.getUsername())
+                        && !isTokenExpired(token)
+                        && !isCreatedBeforeLastPasswordReset(token, user);
     }
 
     // Temporary until Jwts updates to java.time API
@@ -118,31 +110,32 @@ public class Jwt {
         return LocalDateTime.ofInstant(date.toInstant(),ZoneId.systemDefault());
     }
 
-    private static class JwtBuilder {
+    private static class TokenBuilder {
         private String secret;
         private Long expiration;
         private Map<String,Object> claims;
 
-        private JwtBuilder(String secret, Long expiration) {
+        private TokenBuilder(String secret, Long expiration) {
             this.secret = secret;
             this.expiration = expiration;
         }
 
-        private JwtBuilder withClaims(Map<String,Object> claims) {
+        private TokenBuilder withClaims(Map<String,Object> claims) {
             this.claims = claims;
             return this;
         }
 
-        private Jwt build() {
-            String token = Jwts.builder()
+        private String build() {
+            return Jwts.builder()
                     .setClaims(claims)
                     .setExpiration(dateFromLocalDateTime(generateExpirationDate()))
                     .signWith(SignatureAlgorithm.HS512, secret)
                     .compact();
-            return new Jwt(token);
         }
 
         private LocalDateTime generateExpirationDate() {
+            System.out.printf("%n%nCurrent time: %s%n", LocalDateTime.now());
+            System.out.printf("%n%nExpiration: %s%n%n", expiration);
             return LocalDateTime.now().plusSeconds(expiration);
         }
     }

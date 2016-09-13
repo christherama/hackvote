@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static com.teamtreehouse.hackvote.vote.Vote.Status;
 
@@ -45,8 +46,13 @@ public class IdeaInitializer implements ApplicationRunner {
         User user1 = new User("user1","password");
         User user2 = new User("user2","password");
         User user3 = new User("user3","password");
-        User user4 = new User("user3","password");
-        users.save(Arrays.asList(user1,user2,user3,user4));
+        User user4 = new User("user4","password");
+
+        List<User> newUsers = Arrays.asList(user1,user2,user3,user4);
+        newUsers.forEach(u -> {
+
+        });
+        users.save(newUsers);
 
         Idea vr = new Idea(user1,"VR game for learning Java","Creating a VR game for learning to code would give students a truly immersive experience into the syntax of a programming language.");
         vr.addComment(new Comment(user2,"Cool idea!"));
