@@ -6,19 +6,15 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class JwtUtils {
-    private static final String CLAIM_KEY_USERNAME = "sub";
-    private static final String CLAIM_KEY_DATE_CREATED = "created";
+    private static final String CLAIM_KEY_ROLE = "role";
 
     @Value("${jwt.secret}")
     private String secret;
@@ -26,8 +22,8 @@ public class JwtUtils {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    public String generateFromUserDetails(UserDetails userDetails) {
-        return new TokenBuilder(secret,expiration).withUser(userDetails).build();
+    public String generateFromUser(User user) {
+        return new TokenBuilder(secret,expiration).withUser(user).build();
     }
 
     public String getUsername(String token) {
@@ -41,17 +37,25 @@ public class JwtUtils {
         return username;
     }
 
-    public LocalDateTime getTimeCreated(String token) {
+    public Date getDateIssued(String token) {
         try {
-            return LocalDateTime.parse(getClaims(token).get(CLAIM_KEY_DATE_CREATED).toString());
+            return getClaims(token).getIssuedAt();
         } catch (Exception e) {
             return null;
         }
     }
 
-    public LocalDateTime getExpirationTime(String token) {
+    public Date getExpirationDate(String token) {
         try {
-            return localDateTimeFromDate(getClaims(token).getExpiration());
+            return getClaims(token).getExpiration();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public String getRole(String token) {
+        try {
+            return getClaims(token).get(CLAIM_KEY_ROLE,String.class);
         } catch (Exception e) {
             return null;
         }
@@ -69,62 +73,50 @@ public class JwtUtils {
     }
 
     private boolean isTokenExpired(String token) {
-        return getExpirationTime(token).isBefore(LocalDateTime.now());
+        return getExpirationDate(token).before(new Date());
     }
 
-    private boolean isCreatedBeforeLastPasswordReset(String token, User user) {
+    private boolean wasIssuedBeforeLastPasswordReset(String token, User user) {
         LocalDateTime lastPwChange = user.getLastPasswordChange();
-        return lastPwChange != null && getTimeCreated(token).isBefore(lastPwChange);
+        return lastPwChange != null && getDateIssued(token).before(Date.from(lastPwChange.atZone(ZoneId.systemDefault()).toInstant()));
     }
 
     public boolean canTokenBeRefreshed(String token, User user) {
-        return !isCreatedBeforeLastPasswordReset(token, user)
+        return !wasIssuedBeforeLastPasswordReset(token, user)
                 && (!isTokenExpired(token));
     }
 
     public String refresh(String token) {
         try {
-            final Claims claims = getClaims(token);
-            claims.put(CLAIM_KEY_DATE_CREATED, LocalDateTime.now());
+            Claims claims = getClaims(token);
             return new TokenBuilder(secret,expiration).withClaims(claims).build();
         } catch (Exception e) {
             return null;
         }
     }
 
-    public boolean isValid(String token, User user) {
-        return
-                getUsername(token).equals(user.getUsername())
-                        && !isTokenExpired(token)
-                        /*&& !isCreatedBeforeLastPasswordReset(token, user)*/;
-    }
-
-    // Temporary until Jwts updates to java.time API
-    private static Date dateFromLocalDateTime(LocalDateTime ldt) {
-        return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-    }
-    private static LocalDateTime localDateTimeFromDate(Date date) {
-        return LocalDateTime.ofInstant(date.toInstant(),ZoneId.systemDefault());
+    public boolean isValid(String token) {
+        return token != null && !isTokenExpired(token);
     }
 
     private static class TokenBuilder {
         private String secret;
         private Long expiration;
-        private Map<String,Object> claims;
+        private Claims claims;
 
         private TokenBuilder(String secret, Long expiration) {
             this.secret = secret;
             this.expiration = expiration;
+            this.claims = Jwts.claims();
         }
 
-        private TokenBuilder withUser(UserDetails userDetails) {
-            claims = new HashMap<>();
-            claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-            claims.put(CLAIM_KEY_DATE_CREATED, new Date());
+        private TokenBuilder withUser(User user) {
+            claims.setSubject(user.getUsername());
+            claims.put(CLAIM_KEY_ROLE,user.getRole());
             return this;
         }
 
-        private TokenBuilder withClaims(Map<String,Object> claims) {
+        private TokenBuilder withClaims(Claims claims) {
             this.claims = claims;
             return this;
         }
@@ -132,15 +124,14 @@ public class JwtUtils {
         private String build() {
             return Jwts.builder()
                     .setClaims(claims)
-                    .setExpiration(dateFromLocalDateTime(generateExpirationDate()))
+                    .setIssuedAt(new Date())
+                    .setExpiration(generateExpirationDate())
                     .signWith(SignatureAlgorithm.HS512, secret)
                     .compact();
         }
 
-        private LocalDateTime generateExpirationDate() {
-            System.out.printf("%n%nCurrent time: %s%n", LocalDateTime.now());
-            System.out.printf("%n%nExpiration: %s%n%n", expiration);
-            return LocalDateTime.now().plusSeconds(expiration);
+        private Date generateExpirationDate() {
+            return new Date(System.currentTimeMillis() + expiration);
         }
     }
 }
