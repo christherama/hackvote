@@ -27,10 +27,10 @@ public class Idea extends AbstractEntity implements UserData {
     private String title;
     private String description;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Vote> votes;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
     protected Idea() {
