@@ -5,6 +5,8 @@ import com.teamtreehouse.hackvote.core.AbstractEntity;
 import com.teamtreehouse.hackvote.core.UserData;
 import com.teamtreehouse.hackvote.user.User;
 import com.teamtreehouse.hackvote.vote.Vote;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -19,6 +21,8 @@ import java.util.Set;
 import static com.teamtreehouse.hackvote.vote.Vote.Status;
 
 @Entity
+@Data
+@EqualsAndHashCode(callSuper = false, exclude = {"votes","comments"})
 public class Idea extends AbstractEntity implements UserData {
 
     @ManyToOne
@@ -47,64 +51,23 @@ public class Idea extends AbstractEntity implements UserData {
         this.description = description;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    @Override
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public LocalDateTime getPostedDate() {
-        return postedDate;
-    }
-
-    public void setPostedDate(LocalDateTime postedDate) {
-        this.postedDate = postedDate;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Set<Vote> getVotes() {
-        return votes;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
+    public void addComment(Comment comment) {
+        comments.add(comment);
     }
 
     public int getNumComments() {
         return comments.size();
     }
 
-    public void addComment(Comment comment) {
-        comments.add(comment);
-    }
-
     public void vote(Vote vote) {
         votes.add(vote);
     }
 
-    public long getUpVotes() {
+    public long getNumUpVotes() {
         return votes.stream().filter(v -> v.getStatus() == Status.UP).count();
     }
 
-    public long getDownVotes() {
+    public long getNumDownVotes() {
         return votes.stream().filter(v -> v.getStatus() == Status.DOWN).count();
     }
 }
