@@ -2,6 +2,8 @@ package com.teamtreehouse.hackvote.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.teamtreehouse.hackvote.core.AbstractEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Entity
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class User extends AbstractEntity implements UserDetails {
     public static PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
@@ -32,10 +36,6 @@ public class User extends AbstractEntity implements UserDetails {
         this();
         this.username = username;
         setPassword(password);
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     @Override
@@ -67,36 +67,14 @@ public class User extends AbstractEntity implements UserDetails {
         return "ROLE_USER";
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.createAuthorityList(getRole());
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public void setPassword(String password) {
         this.password = PASSWORD_ENCODER.encode(password);
         this.lastPasswordChange = LocalDateTime.now();
-    }
-
-    public LocalDateTime getLastPasswordChange() {
-        return lastPasswordChange;
-    }
-
-    public void setLastPasswordChange(LocalDateTime lastPasswordChange) {
-        this.lastPasswordChange = lastPasswordChange;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        User u = (User)o;
-        return getId().equals(u.getId());
     }
 }
