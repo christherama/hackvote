@@ -7,6 +7,6 @@ public interface IdeaProjection {
     String getTitle();
     String getDescription();
     String getNumComments();
-    int getUpVotes();
-    int getDownVotes();
+    int getNumUpVotes();
+    int getNumDownVotes();
 }
