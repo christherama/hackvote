@@ -18,63 +18,63 @@ import java.util.Collection;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class User extends AbstractEntity implements UserDetails {
-    public static PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
+  public static PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
-    private String username;
+  private String username;
 
-    @JsonIgnore
-    private String password;
+  @JsonIgnore
+  private String password;
 
-    @JsonIgnore
-    private LocalDateTime lastPasswordChange;
+  @JsonIgnore
+  private LocalDateTime lastPasswordChange;
 
-    protected User() {
-        super();
-    }
+  protected User() {
+    super();
+  }
 
-    public User(String username, String password) {
-        this();
-        this.username = username;
-        setPassword(password);
-    }
+  public User(String username, String password) {
+    this();
+    this.username = username;
+    setPassword(password);
+  }
 
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+  @Override
+  @JsonIgnore
+  public boolean isAccountNonExpired() {
+    return true;
+  }
 
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+  @Override
+  @JsonIgnore
+  public boolean isAccountNonLocked() {
+    return true;
+  }
 
-    @Override
-    @JsonIgnore
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+  @Override
+  @JsonIgnore
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
 
-    @Override
-    @JsonIgnore
-    public boolean isEnabled() {
-        return true;
-    }
+  @Override
+  @JsonIgnore
+  public boolean isEnabled() {
+    return true;
+  }
 
-    @JsonIgnore
-    public String getRole() {
-        return "ROLE_USER";
-    }
+  @JsonIgnore
+  public String getRole() {
+    return "ROLE_USER";
+  }
 
-    @Override
-    @JsonIgnore
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return AuthorityUtils.createAuthorityList(getRole());
-    }
+  @Override
+  @JsonIgnore
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return AuthorityUtils.createAuthorityList(getRole());
+  }
 
-    public void setPassword(String password) {
-        this.password = PASSWORD_ENCODER.encode(password);
-        this.lastPasswordChange = LocalDateTime.now();
-    }
+  public void setPassword(String password) {
+    this.password = PASSWORD_ENCODER.encode(password);
+    this.lastPasswordChange = LocalDateTime.now();
+  }
 }

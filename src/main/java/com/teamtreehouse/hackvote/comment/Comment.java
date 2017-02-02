@@ -15,22 +15,22 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class Comment extends AbstractEntity implements UserData {
-    @ManyToOne
-    private Idea idea;
+  @ManyToOne
+  private Idea idea;
 
-    @ManyToOne
-    private User user;
-    private LocalDateTime postedDate;
-    private String comment;
+  @ManyToOne
+  private User user;
+  private LocalDateTime postedDate;
+  private String comment;
 
-    protected Comment() {
-        super();
-        postedDate = LocalDateTime.now();
-    }
+  protected Comment() {
+    super();
+    postedDate = LocalDateTime.now();
+  }
 
-    public Comment(User user, String comment) {
-        this();
-        this.user = user;
-        this.comment = comment;
-    }
+  public Comment(User user, String comment) {
+    this();
+    this.user = user;
+    this.comment = comment;
+  }
 }

@@ -6,5 +6,5 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @RepositoryRestResource(excerptProjection = IdeaProjection.class)
 @PreAuthorize("hasRole('USER')")
-public interface IdeaRepository extends PagingAndSortingRepository<Idea,Long>{
+public interface IdeaRepository extends PagingAndSortingRepository<Idea, Long> {
 }

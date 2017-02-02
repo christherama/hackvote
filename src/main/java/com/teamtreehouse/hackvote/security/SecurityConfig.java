@@ -18,46 +18,46 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private String basePath;
+  private String basePath;
 
-    private RestAuthenticationEntryPoint authEntryPoint;
-    private JwtAuthenticationFilter jwtAuthFilter;
-    private UserService userService;
+  private RestAuthenticationEntryPoint authEntryPoint;
+  private JwtAuthenticationFilter jwtAuthFilter;
+  private UserService userService;
 
-    @Autowired
-    public SecurityConfig(
-            RestAuthenticationEntryPoint authEntryPoint,
-            JwtAuthenticationFilter jwtAuthFilter,
-            UserService userService,
-            @Value("${spring.data.rest.basePath}") String basePath) {
-        this.authEntryPoint = authEntryPoint;
-        this.jwtAuthFilter = jwtAuthFilter;
-        this.userService = userService;
-        this.basePath = basePath;
-    }
+  @Autowired
+  public SecurityConfig(
+      RestAuthenticationEntryPoint authEntryPoint,
+      JwtAuthenticationFilter jwtAuthFilter,
+      UserService userService,
+      @Value("${spring.data.rest.basePath}") String basePath) {
+    this.authEntryPoint = authEntryPoint;
+    this.jwtAuthFilter = jwtAuthFilter;
+    this.userService = userService;
+    this.basePath = basePath;
+  }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(basePath + "/login", basePath + "/signup");
-    }
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+    web.ignoring().antMatchers(basePath + "/login", basePath + "/signup");
+  }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(authEntryPoint)
-            .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-                .authorizeRequests()
-                .antMatchers(basePath).authenticated();
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.csrf().disable()
+        .exceptionHandling()
+        .authenticationEntryPoint(authEntryPoint)
+        .and()
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+        .authorizeRequests()
+        .antMatchers(basePath).authenticated();
 
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-    }
+    http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+  }
 
-    @Autowired
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(User.PASSWORD_ENCODER);
-    }
+  @Autowired
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.userDetailsService(userService).passwordEncoder(User.PASSWORD_ENCODER);
+  }
 }

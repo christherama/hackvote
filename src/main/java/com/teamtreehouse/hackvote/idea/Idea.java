@@ -22,52 +22,52 @@ import static com.teamtreehouse.hackvote.vote.Vote.Status;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = false, exclude = {"votes","comments"})
+@EqualsAndHashCode(callSuper = false, exclude = {"votes", "comments"})
 public class Idea extends AbstractEntity implements UserData {
 
-    @ManyToOne
-    private User user;
-    private LocalDateTime postedDate;
-    private String title;
-    private String description;
+  @ManyToOne
+  private User user;
+  private LocalDateTime postedDate;
+  private String title;
+  private String description;
 
-    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Vote> votes;
+  @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<Vote> votes;
 
-    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
+  @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Comment> comments;
 
-    protected Idea() {
-        super();
-        this.postedDate = LocalDateTime.now();
-        this.comments = new ArrayList<>();
-        this.votes = new HashSet<>();
-    }
+  protected Idea() {
+    super();
+    this.postedDate = LocalDateTime.now();
+    this.comments = new ArrayList<>();
+    this.votes = new HashSet<>();
+  }
 
-    public Idea(User user, String title, String description) {
-        this();
-        this.user = user;
-        this.title = title;
-        this.description = description;
-    }
+  public Idea(User user, String title, String description) {
+    this();
+    this.user = user;
+    this.title = title;
+    this.description = description;
+  }
 
-    public void addComment(Comment comment) {
-        comments.add(comment);
-    }
+  public void addComment(Comment comment) {
+    comments.add(comment);
+  }
 
-    public int getNumComments() {
-        return comments.size();
-    }
+  public int getNumComments() {
+    return comments.size();
+  }
 
-    public void vote(Vote vote) {
-        votes.add(vote);
-    }
+  public void vote(Vote vote) {
+    votes.add(vote);
+  }
 
-    public long getNumUpVotes() {
-        return votes.stream().filter(v -> v.getStatus() == Status.UP).count();
-    }
+  public long getNumUpVotes() {
+    return votes.stream().filter(v -> v.getStatus() == Status.UP).count();
+  }
 
-    public long getNumDownVotes() {
-        return votes.stream().filter(v -> v.getStatus() == Status.DOWN).count();
-    }
+  public long getNumDownVotes() {
+    return votes.stream().filter(v -> v.getStatus() == Status.DOWN).count();
+  }
 }

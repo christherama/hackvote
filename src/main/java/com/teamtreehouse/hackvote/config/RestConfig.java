@@ -8,15 +8,15 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class RestConfig {
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedMethod("*");
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        source.registerCorsConfiguration("/api/**", config);
-        return new CorsFilter(source);
-    }
+  @Bean
+  public CorsFilter corsFilter() {
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowCredentials(true);
+    config.addAllowedMethod("*");
+    config.addAllowedOrigin("*");
+    config.addAllowedHeader("*");
+    source.registerCorsConfiguration("/api/**", config);
+    return new CorsFilter(source);
+  }
 }

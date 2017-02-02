@@ -13,15 +13,15 @@ import javax.persistence.*;
 @ToString
 @EqualsAndHashCode
 public class AbstractEntity implements Identifiable<Long> {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @JsonIgnore
-    private final Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @JsonIgnore
+  private final Long id;
 
-    @Version
-    private Long version;
+  @Version
+  private Long version;
 
-    protected AbstractEntity() {
-        this.id = null;
-    }
+  protected AbstractEntity() {
+    this.id = null;
+  }
 }
