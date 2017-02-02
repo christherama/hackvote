@@ -1,4 +1,4 @@
-package com.teamtreehouse.hackvote.security;
+package com.teamtreehouse.hackvote.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,5 +1,7 @@
-package com.teamtreehouse.hackvote.security;
+package com.teamtreehouse.hackvote.config;
 
+import com.teamtreehouse.hackvote.auth.JwtAuthenticationFilter;
+import com.teamtreehouse.hackvote.auth.RestAuthenticationEntryPoint;
 import com.teamtreehouse.hackvote.user.User;
 import com.teamtreehouse.hackvote.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

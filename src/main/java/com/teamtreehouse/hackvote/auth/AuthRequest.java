@@ -1,4 +1,4 @@
-package com.teamtreehouse.hackvote.security;
+package com.teamtreehouse.hackvote.auth;
 
 import lombok.Data;
 
