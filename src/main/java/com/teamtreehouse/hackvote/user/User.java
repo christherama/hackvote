@@ -22,7 +22,6 @@ public class User extends AbstractEntity implements UserDetails {
 
   private String username;
 
-  @JsonIgnore
   private String password;
 
   @JsonIgnore

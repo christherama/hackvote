@@ -1,20 +1,19 @@
 package com.teamtreehouse.hackvote.controller;
 
+import com.teamtreehouse.hackvote.security.AuthRequest;
 import com.teamtreehouse.hackvote.security.JwtAuthenticationResponse;
 import com.teamtreehouse.hackvote.security.JwtUtils;
 import com.teamtreehouse.hackvote.user.User;
 import com.teamtreehouse.hackvote.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AuthenticationController {
@@ -32,19 +31,20 @@ public class AuthenticationController {
     this.jwtUtils = jwtUtils;
   }
 
-  @RequestMapping(value = "${jwt.route.auth}", method = RequestMethod.POST)
-  public ResponseEntity<?> createAuthenticationToken(@RequestParam String username, @RequestParam String password) throws AuthenticationException {
+  @RequestMapping(value = "${jwt.route.auth}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public JwtAuthenticationResponse createAuthenticationToken(@RequestBody AuthRequest auth) throws AuthenticationException {
     // Perform authentication
     Authentication authentication = authManager.authenticate(
-        new UsernamePasswordAuthenticationToken(username, password)
+        new UsernamePasswordAuthenticationToken(auth.getUsername(), auth.getPassword())
     );
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    // Reload password post-security so we can generate token
-    User user = userService.loadUserByUsername(username);
+    // Generate token
+    User user = userService.loadUserByUsername(auth.getUsername());
     String token = jwtUtils.generateFromUser(user);
 
     // Return the token
-    return ResponseEntity.ok(new JwtAuthenticationResponse(token));
+    return new JwtAuthenticationResponse(token);
   }
 }
